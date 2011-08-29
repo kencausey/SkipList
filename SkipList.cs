@@ -25,16 +25,17 @@ namespace SkipList
             public SkipListPair<T,U> keyValue;
             public T? key
             {
-                get { return keyValue.first; }
+                get { return keyValue.first.Value; }
             }
             public U? value
             {
-                get { return keyValue.second; }
-                set { keyValue = new SkipListPair<T,U>(keyValue.first, value); }
+                get { return keyValue.second.Value; }
+                set { keyValue = new SkipListPair<T,U>(keyValue.first.Value, value); }
             }
 
             public SkipListNode()
             {
+                this.keyValue = new SkipListPair<T,U>(null, null);
             }
 
             public SkipListNode(SkipListPair<T,U> keyValue)
@@ -61,10 +62,10 @@ namespace SkipList
             else
             {
                 SkipListNode<T,U> newEntry = new SkipListNode<T,U>((T) key, value);
-                newEntry.back = position.first;
-                if(position.first.forward.HasValue)
-                    newEntry.forward = position.first.forward;
-                position.first.forward = newEntry;
+                newEntry.back = position.first.Value;
+                if(position.first.Value.forward.HasValue)
+                    newEntry.forward = position.first.Value.forward;
+                position.first.Value.forward = newEntry;
                 promote(newEntry);
             }
         }
@@ -74,7 +75,7 @@ namespace SkipList
             SkipListPair<SkipListNode<T,U>, SkipListNode<T,U>> position = search(key);
             if (!position.second.HasValue)
                 return null;
-            return position.second.value;
+            return position.second.Value.value;
         }
 
         private SkipListPair<SkipListNode<T,U>, SkipListNode<T,U>> search(IComparable<T> key)
@@ -82,21 +83,21 @@ namespace SkipList
             SkipListNode<T,U> current, previous;
             previous = current = this.head;  // Problem to set previous here?  Eliminates error below, but recheck logic.
 
-            while ((!current.key.HasValue || key.CompareTo(current.key) >= 0) && (current.forward.HasValue && current.down.HasValue))
+            while ((!current.key.HasValue || key.CompareTo(current.key.Value) >= 0) && (current.forward.HasValue && current.down.HasValue))
             {
                 previous = current;
-                if (!current.forward.HasValue || key.CompareTo(current.key) <= 0)
+                if (!current.forward.HasValue || key.CompareTo(current.key.Value) <= 0)
                 {
                     if (!current.down.HasValue)
                         return new SkipListPair<SkipListNode<T, U>, SkipListNode<T, U>>(previous, null);
                     else
-                        current = current.down;
+                        current = current.down.Value;
                 }
                 else
-                    current = current.forward;
+                    current = current.forward.Value;
             }
 
-            if (key.CompareTo(current.key) == 0)
+            if (key.CompareTo(current.key.Value) == 0)
                 return new SkipListPair<SkipListNode<T, U>, SkipListNode<T, U>>(previous, current);
             else
                 return new SkipListPair<SkipListNode<T, U>, SkipListNode<T, U>>(previous, null);
@@ -104,21 +105,21 @@ namespace SkipList
 
         private void promote(SkipListNode<T,U> node)
         {
-            SkipListNode<T,U> up = node.back;
+            SkipListNode<T,U> up = node.back.Value;
             SkipListNode<T,U> last = node;
 
             for (int levels = this.levels(); levels > 0; levels--)
             {
                 while (!up.up.HasValue && up.back.HasValue)
-                    up = up.back;
+                    up = up.back.Value;
 
                 if (!up.back.HasValue)
                     up.up = new SkipListNode<T, U>();
-                up = up.up;
+                up = up.up.Value;
 
                 SkipListNode<T, U> previous = up;
-                while (((IComparable) previous.key).CompareTo(node.key) < 0 && previous.forward.HasValue)
-                    previous = previous.forward;
+                while (((IComparable)previous.key.Value).CompareTo(node.key) < 0 && previous.forward.HasValue)
+                    previous = previous.forward.Value;
 
                 SkipListNode<T, U> newNode = new SkipListNode<T, U>(node.keyValue);
                 newNode.forward = previous.forward;
