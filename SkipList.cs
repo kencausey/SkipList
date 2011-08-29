@@ -7,7 +7,7 @@ namespace SkipList
 
         private SkipListNode<IComparable<T>,U> head;
 
-        private class SkipListNode<IComparable<T>, U>
+        private class SkipListNode<T, U>
         {
             public SkipListNode<IComparable<T>,U> forward, back, up, down;
             public Tuple<IComparable<T>,U> keyValue;
@@ -57,7 +57,7 @@ namespace SkipList
             }
         }
 
-        public Nullable<U> get(IComparable<T>key)
+        public U get(IComparable<T>key)
         {
             Tuple<SkipListNode<IComparable<T>,U>, SkipListNode<IComparable<T>,U>> position = search(key);
             if (position.Item2 == null)
