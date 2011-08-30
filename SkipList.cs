@@ -85,6 +85,52 @@ namespace SkipList
             }
         }
 
+        public class Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>
+        {
+            private SkipListNode<TKey, TValue> node;
+
+            public KeyValuePair<TKey, TValue> Current
+            {
+                get
+                {
+                    return new KeyValuePair<TKey, TValue>(node.key, node.value);
+                }
+            }
+
+            public Object Current
+            {
+                get
+                {
+                    return new KeyValuePair<TKey, TValue>(node.key, node.value);
+                }
+            }
+
+            public Enumerator()
+            {
+                Reset();
+            }
+
+            public void Reset()
+            {
+                node = this.head;
+                while(node.down != null)
+                    node = node.down;
+            }
+
+            public bool MoveNext()
+            {
+                if(node == null)
+                    return false;
+                node = node.forward;
+                return true;
+            }
+
+            public void Dispose()
+            {
+                node = null;
+            }
+        }
+
         public SkipList()
         {
             this.head = new SkipListNode<TKey, TValue>();
@@ -187,6 +233,11 @@ namespace SkipList
 
             int i = index;
             walkEntries(n => array[i++] = new KeyValuePair<TKey, TValue>(n.key, n.value));
+        }
+
+        public SkipList<TKey, TValue>.Enumerator GetEnumerator()
+        {
+            return new SkipList<TKey, TValue>.Enumerator();
         }
 
         private TValue get(IComparable<TKey> key)
