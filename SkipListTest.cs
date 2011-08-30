@@ -18,8 +18,8 @@ namespace SkipListTest
         [Test]
         public void HoldsValue()
         {
-            sl.add("foo", "fie");
-            Assert.AreEqual(sl.get("foo"), "fie");
+            sl["foo"] = "fie";
+            Assert.AreEqual(sl["foo"], "fie");
         }
     }
 }
