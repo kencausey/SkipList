@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace SkipList
@@ -97,11 +98,11 @@ namespace SkipList
                 }
             }
 
-            public Object Current
+            object IEnumerator.Current
             {
                 get
                 {
-                    return new KeyValuePair<TKey, TValue>(node.key, node.value);
+                    return Current;
                 }
             }
 
@@ -235,7 +236,7 @@ namespace SkipList
             walkEntries(n => array[i++] = new KeyValuePair<TKey, TValue>(n.key, n.value));
         }
 
-        public SkipList<TKey, TValue>.Enumerator GetEnumerator()
+        public IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             return new SkipList<TKey, TValue>.Enumerator();
         }
