@@ -86,52 +86,6 @@ namespace SkipList
             }
         }
 
-        public class Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>
-        {
-            private SkipListNode<TKey, TValue> node;
-
-            public KeyValuePair<TKey, TValue> Current
-            {
-                get
-                {
-                    return new KeyValuePair<TKey, TValue>(node.key, node.value);
-                }
-            }
-
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return Current;
-                }
-            }
-
-            public Enumerator()
-            {
-                Reset();
-            }
-
-            public void Reset()
-            {
-                node = this.head;
-                while(node.down != null)
-                    node = node.down;
-            }
-
-            public bool MoveNext()
-            {
-                if(node == null)
-                    return false;
-                node = node.forward;
-                return true;
-            }
-
-            public void Dispose()
-            {
-                node = null;
-            }
-        }
-
         public SkipList()
         {
             this.head = new SkipListNode<TKey, TValue>();
@@ -236,12 +190,24 @@ namespace SkipList
             walkEntries(n => array[i++] = new KeyValuePair<TKey, TValue>(n.key, n.value));
         }
 
-        public IEnumerable<KeyValuePair<TKey, TValue>> GetEnumerator()
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return new SkipList<TKey, TValue>.Enumerator();
+            SkipListNode<TKey, TValue> position = head;
+            while (position.down != null)
+                position = position.down;
+            while (position.forward != null)
+            {
+                position = position.forward;
+                yield return new KeyValuePair<TKey, TValue>(position.key, position.value);
+            }
         }
 
-        private TValue get(IComparable<TKey> key)
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return (IEnumerator) GetEnumerator();
+        }
+
+        private TValue get(TKey key)
         {
             SkipListPair<SkipListNode<TKey, TValue>, SkipListNode<TKey, TValue>> position = search(key);
             if (position.first == null)
@@ -260,7 +226,7 @@ namespace SkipList
             }
         }
 
-        private SkipListPair<SkipListNode<TKey, TValue>, SkipListNode<TKey, TValue>> search(IComparable<TKey> key)
+        private SkipListPair<SkipListNode<TKey, TValue>, SkipListNode<TKey, TValue>> search(TKey key)
         {
             if(key == null)
                 throw new ArgumentNullException("key");
