@@ -287,7 +287,7 @@ namespace SkipList
                 value = get(key);
                 return true;
             }
-            catch (KeyNotFoundException e)
+            catch (KeyNotFoundException)
             {
                 value = default(TValue);
                 return false;
